@@ -2,8 +2,6 @@
 import React from "react";
 import { motion } from "motion/react";
 
-
-
 const transition = {
   type: "spring" as const,
   mass: 0.5,
@@ -32,33 +30,33 @@ export const MenuItem = ({
       >
         {item}
       </motion.p>
-      {active !== null && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.85, y: 10 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={transition}
-        >
+
+        {active !== null && (
+        <div className="absolute top-[calc(100%_+_1.2rem)] left-1/2 transform -translate-x-1/2 pt-4">
+
           {active === item && children && (
-            <div className="absolute top-[calc(100%_+_1.2rem)] left-1/2 transform -translate-x-1/2 pt-4">
+            <motion.div
+              layoutId="active"
+              initial={{ opacity: 0, scale: 0.85, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.85, y: 10 }}
+              transition={transition}
+              className="bg-white dark:bg-black backdrop-blur-sm rounded-2xl overflow-hidden border border-black/[0.2] dark:border-white/[0.2] shadow-xl"
+            >
               <motion.div
-                transition={transition}
-                layoutId="active" // layoutId ensures smooth animation
-                className="bg-white dark:bg-black backdrop-blur-sm rounded-2xl overflow-hidden border border-black/[0.2] dark:border-white/[0.2] shadow-xl"
+                layout
+                className="w-max h-full p-4"
               >
-                <motion.div
-                  layout // layout ensures smooth animation
-                  className="w-max h-full p-4"
-                >
-                  {children}
-                </motion.div>
+                {children}
               </motion.div>
-            </div>
+            </motion.div>
           )}
-        </motion.div>
+        </div>
       )}
     </div>
   );
 };
+
 
 export const Menu = ({
   setActive,
@@ -70,7 +68,7 @@ export const Menu = ({
   return (
     <nav
       onMouseLeave={() => setActive(null)} // resets the state
-      className="relative rounded-full border border-transparent dark:bg-black dark:border-white/[0.2] bg-white shadow-input flex justify-center space-x-4 px-8 py-6 "
+      className="relative rounded-full border border-transparent dark:bg-black dark:border-white/[0.2] bg-white shadow-input flex justify-center space-x-4 px-8 py-6"
     >
       {children}
     </nav>
@@ -81,7 +79,7 @@ export const HoveredLink = ({ children, ...rest }: any) => {
   return (
     <a
       {...rest}
-      className="text-black dark:text-white hover:text-neutral-700/80 dark:hover:text-neutral-400 transition-colors"
+      className="text-black dark:text-white hover:text-neutral-700/80 dark:hover:text-neutral-400 transition-colors duration-300 ease-in-out"
     >
       {children}
     </a>
