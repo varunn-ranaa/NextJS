@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
             success : true,
             message : 'User registered Successfully !',
             savedUser 
-        } , {status : 400})
+        } , {status : 201})
         
     }
     catch (error: any) {
