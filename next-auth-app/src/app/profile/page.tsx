@@ -29,11 +29,12 @@ export default function ProfilePage() {
 
     useEffect(() => {
         const fetchProfile = async () => {
+
             try {
                 const res = await axios.get('/api/user/profile')
                 setUser(res.data.user)
             } catch (error: any) {
-                const message = error.response?.data?.error || 'Failed to load profile session'
+                const message = 'Failed to load profile session'
                 toast.error(message)
                 router.push('/login')
             } finally {
