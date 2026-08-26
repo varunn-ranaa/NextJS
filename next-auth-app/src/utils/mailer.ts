@@ -1,5 +1,6 @@
 import User from '@/models/userModel';
 import bcryptjs from 'bcryptjs';
+import { set } from 'mongoose';
 import nodemailer from 'nodemailer'
 
 
@@ -17,14 +18,20 @@ export const sendEmail = async ({ email, emailType, userId }: mailType) => {
 
         if (emailType === 'VERIFY') {
             await User.findByIdAndUpdate(userId, {
-                VerifyToken: token,
-                VerifyTokenExpiry: new Date(Date.now() + 3600000)
+                $set: {
+                    VerifyToken: token,
+                    VerifyTokenExpiry: new Date(Date.now() + 3600000)
+                }
+            })
+        } else if (emailType === 'RESET') {
+            await User.findByIdAndUpdate(userId, {
+                $set: {
+                    forgotPasswordToken: token,
+                    forgotPasswordTokenExpiry: new Date(Date.now() + 3600000)
+                }
             })
         } else {
-            User.findByIdAndUpdate({
-                forgotPasswordToken: token,
-                forgotPasswordTokenExpiry: new Date(Date.now() + 3600000)
-            })
+            throw new Error('Invalid emailType')
         }
 
 
@@ -42,8 +49,8 @@ export const sendEmail = async ({ email, emailType, userId }: mailType) => {
         console.log("Server is ready to take our messages");
 
 
-        const path = emailType === 'VERIFY' ? 'verifyemail' : 'resetpassword';
-        const targetUrl = `${process.env.DOMAIN}/${path}?token=${token}`;
+        const path = emailType === 'VERIFY' ? 'verifyemail' : 'changepassword';
+        const targetUrl = `${process.env.DOMAIN}/${path}?token=${encodeURIComponent(token)}`;
 
         const mailOptions = {
             from: 'spectra <spec@dev.io>',
@@ -56,13 +63,11 @@ export const sendEmail = async ({ email, emailType, userId }: mailType) => {
 
         const mailRes = await transporter.sendMail(mailOptions)
 
-        console.log("Message sent: %s", mailRes.messageId);
+        return mailRes;
 
-            return mailRes;
-
-        } catch (error: any) {
-            console.error("Email workflow error:", error);
-            throw new Error(error.message)
-        }
-
+    } catch (error: any) {
+        console.error("Email workflow error:", error);
+        throw new Error(error.message)
     }
+
+}
